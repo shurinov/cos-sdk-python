@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 
+from typing import Optional
 from ecdsa import SECP256k1, SigningKey
 from ecdsa.util import sigencode_string_canonize
 from ..core import PublicKey, SimplePublicKey
@@ -39,9 +40,9 @@ class RawKey(Key):
         """
         return cls(bytes.fromhex(private_key_hex))
 
-    def __init__(self, private_key: bytes):
+    def __init__(self, private_key: bytes, bech32prefix: Optional[str]):
         public_key = compute_public_key(private_key)
-        super().__init__(public_key)
+        super().__init__(public_key, bech32prefix)
         self.private_key = private_key
 
     def sign(self, payload: bytes) -> bytes:

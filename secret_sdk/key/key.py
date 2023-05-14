@@ -29,6 +29,9 @@ from secret_sdk.core.signature_v2 import Single as SingleDescriptor
 __all__ = ["Key"]
 
 
+BECH32_PREFIX = "secret"
+
+
 def get_bech(prefix: str, payload: str) -> str:
     data = convertbits(bytes.fromhex(payload), 8, 5)
     if data is None:
@@ -63,9 +66,13 @@ class Key:
     """Raw Bech32 words of pubkey, used to derive associated account and validator
     pubkeys.
     """
+    
+    bech32prefix: Optional[str]
+    """Key prefix"""
 
-    def __init__(self, public_key: Optional[PublicKey] = None):
+    def __init__(self, public_key: Optional[PublicKey] = None, bech32prefix: Optional[str] = BECH32_PREFIX):
         self.public_key = public_key
+        self.bech32prefix = bech32prefix
         if public_key:
             self.raw_address = address_from_public_key(public_key)
             self.raw_pubkey = pubkey_from_public_key(public_key)
@@ -97,7 +104,7 @@ class Key:
         """
         if not self.raw_address:
             raise ValueError("could not compute acc_address: missing raw_address")
-        return AccAddress(get_bech("secret", self.raw_address.hex()))
+        return AccAddress(get_bech(self.bech32prefix, self.raw_address.hex()))
 
     @property
     def val_address(self) -> ValAddress:
@@ -111,7 +118,7 @@ class Key:
         """
         if not self.raw_address:
             raise ValueError("could not compute val_address: missing raw_address")
-        return ValAddress(get_bech("secretvaloper", self.raw_address.hex()))
+        return ValAddress(get_bech(f"{self.bech32prefix}valoper", self.raw_address.hex()))
 
     @property
     def acc_pubkey(self) -> AccPubKey:
@@ -125,7 +132,7 @@ class Key:
         """
         if not self.raw_pubkey:
             raise ValueError("could not compute acc_pubkey: missing raw_pubkey")
-        return AccPubKey(get_bech("secretpub", self.raw_pubkey.hex()))
+        return AccPubKey(get_bech(f"{self.bech32prefix}pub", self.raw_pubkey.hex()))
 
     @property
     def val_pubkey(self) -> ValPubKey:
@@ -139,7 +146,7 @@ class Key:
         """
         if not self.raw_pubkey:
             raise ValueError("could not compute val_pubkey: missing raw_pubkey")
-        return ValPubKey(get_bech("secretvaloperpub", self.raw_pubkey.hex()))
+        return ValPubKey(get_bech(f"{self.bech32prefix}valoperpub", self.raw_pubkey.hex()))
 
     def create_signature(self, sign_doc: SignDoc) -> SignatureV2:
         """Signs the transaction with the signing algorithm provided by this Key implementation,

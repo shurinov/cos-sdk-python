@@ -117,11 +117,12 @@ class AsyncLCDClient:
         self.tx = AsyncTxAPI(self)
         self.registration = AsyncRegistrationAPI(self)
 
-        if self.chain_id in mainnet_chain_ids:
-            consensus_io_pub_key = mainnetConsensusIoPubKey
-        else:
-            consensus_io_pub_key = RegistrationAPI(self).consensus_io_pub_key()
-        self.encrypt_utils = EncryptionUtils(consensus_io_pub_key)
+        # TODO: remove secret part
+        # if self.chain_id in mainnet_chain_ids:
+        #     consensus_io_pub_key = mainnetConsensusIoPubKey
+        # else:
+        #     consensus_io_pub_key = RegistrationAPI(self).consensus_io_pub_key()
+        # self.encrypt_utils = EncryptionUtils(consensus_io_pub_key)
 
     def wallet(self, key: Key) -> AsyncWallet:
         """Creates a :class:`AsyncWallet` object from a key.
@@ -306,11 +307,11 @@ class LCDClient(AsyncLCDClient):
         self.tx = TxAPI(self)
         self.registration = RegistrationAPI(self)
 
-        if self.chain_id in mainnet_chain_ids:
-            consensus_io_pub_key = mainnetConsensusIoPubKey
-        else:
-            consensus_io_pub_key = self.registration.consensus_io_pub_key()
-        self.encrypt_utils = EncryptionUtils(consensus_io_pub_key)
+        # if self.chain_id in mainnet_chain_ids:
+        #     consensus_io_pub_key = mainnetConsensusIoPubKey
+        # else:
+        #     consensus_io_pub_key = self.registration.consensus_io_pub_key()
+        # self.encrypt_utils = EncryptionUtils(consensus_io_pub_key)
 
     async def __aenter__(self):
         raise NotImplementedError(

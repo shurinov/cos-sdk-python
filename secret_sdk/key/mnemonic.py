@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from .bip32utils.BIP32Key import BIP32Key, BIP32_HARDEN
 from mnemonic import Mnemonic
+from typing import Optional
 
 from .raw import RawKey
 
 __all__ = ["MnemonicKey", "SCRT_COIN_TYPE"]
 
-SCRT_COIN_TYPE = 529
+#SCRT_COIN_TYPE = 529 # Secret network default coin type
+#COIN_TYPE = SCRT_COIN_TYPE
+COIN_TYPE = 118 # change coin type to more common for cosmos sdk chains
 
 
 class MnemonicKey(RawKey):
@@ -34,6 +37,8 @@ class MnemonicKey(RawKey):
     coin_type: int
     """HD path parameter: coin type"""
 
+    bech32prefix: str
+
     @property
     def hd_path(self) -> str:
         """Returns the BIP32 HD path for key-derivation:
@@ -50,7 +55,8 @@ class MnemonicKey(RawKey):
         mnemonic: str = None,
         account: int = 0,
         index: int = 0,
-        coin_type: int = SCRT_COIN_TYPE,
+        coin_type: int = COIN_TYPE,
+        bech32prefix: Optional[str] = None,
     ):
         if mnemonic is None:
             mnemonic = Mnemonic("english").generate(256)
@@ -65,7 +71,8 @@ class MnemonicKey(RawKey):
             .ChildKey(index)
         )
 
-        super().__init__(child.PrivateKey())
+        super().__init__(child.PrivateKey(), bech32prefix)
         self.mnemonic = mnemonic
         self.account = account
         self.index = index
+        self.bech32prefix = bech32prefix

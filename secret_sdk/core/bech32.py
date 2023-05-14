@@ -53,17 +53,19 @@ ValPubKey.__doc__ = """Secret Bech32 Validator PubKey -- type alias of str."""
 #  """Secret Bech32 Validator Conensus PubKey -- type alias of str."""
 # )
 
-bech32_config = {
-    "acc_address": ("secret", 45),
-    "val_address": ("secretvaloper", 52),
-    "pubkey": ("secretpub", 77),
-    "val_pubkey": ("secretvaloperpub", 84),
-    "valcons_pubkey": ("secretvalconspub", 83)
+# #reference
+# bech32_config = {
+#     "acc_address": ("secret", 45),
+#     "val_address": ("secretvaloper", 52),
+#     "pubkey": ("secretpub", 77),
+#     "val_pubkey": ("secretvaloperpub", 84),
+#     "valcons_pubkey": ("secretvalconspub", 83)
+# }
+
+DEFAULT_PREFIX = 'secret'
 
 
-}
-
-def is_acc_address(data: str) -> bool:
+def is_acc_address(data: str, prefix: str = DEFAULT_PREFIX) -> bool:
     """Checks whether the given string is a properly formatted Secret account address.
 
     Args:
@@ -72,11 +74,12 @@ def is_acc_address(data: str) -> bool:
     Returns:
         bool: whether the string is a proper account address
     """
-    prefix, length = bech32_config["acc_address"]
+    #prefix, length = bech32_config["acc_address"]
+    length = 39 + len(prefix)
     return check_prefix_and_length(prefix, data, length)
 
 
-def to_acc_address(data: ValAddress) -> AccAddress:
+def to_acc_address(data: ValAddress, prefix: str = DEFAULT_PREFIX) -> AccAddress:
     """Converts a validator operator address into an account address.
 
     Args:
@@ -91,10 +94,10 @@ def to_acc_address(data: ValAddress) -> AccAddress:
     vals = bech32_decode(data)
     if vals[1] is None:
         raise ValueError(f"invalid bech32: {data}")
-    return AccAddress(bech32_encode("secret", vals[1]))
+    return AccAddress(bech32_encode(prefix, vals[1]))
 
 
-def is_val_address(data: str) -> bool:
+def is_val_address(data: str, prefix: str = DEFAULT_PREFIX) -> bool:
     """Checks whether the given string is a properly formatted Secret validator operator
     address.
 
@@ -104,11 +107,13 @@ def is_val_address(data: str) -> bool:
     Returns:
         bool: whether the string is a proper validator address
     """
-    prefix, length = bech32_config["val_address"]
+    #prefix, length = bech32_config["val_address"]
+    prefix = str(f"{prefix}valoper")
+    length = 39 + len(prefix)
     return check_prefix_and_length(prefix, data, length)
 
 
-def to_val_address(data: AccAddress) -> ValAddress:
+def to_val_address(data: AccAddress, prefix: str = DEFAULT_PREFIX) -> ValAddress:
     """Converts an account address into a validator operator address.
 
     Args:
@@ -123,10 +128,10 @@ def to_val_address(data: AccAddress) -> ValAddress:
     vals = bech32_decode(data)
     if vals[1] is None:
         raise ValueError(f"invalid bech32: {data}")
-    return ValAddress(bech32_encode("secretvaloper", vals[1]))
+    return ValAddress(bech32_encode(f"{prefix}valoper", vals[1]))
 
 
-def is_acc_pubkey(data: str) -> bool:
+def is_acc_pubkey(data: str, prefix: str = DEFAULT_PREFIX) -> bool:
     """Checks whether the provided string is a properly formatted Secret account pubkey.
 
     Args:
@@ -135,11 +140,13 @@ def is_acc_pubkey(data: str) -> bool:
     Returns:
         bool: whether string is account pubkey
     """
-    prefix, length = bech32_config["pubkey"]
+    #prefix, length = bech32_config["pubkey"]
+    prefix = str(f"{prefix}pub")
+    length = 39 + len(prefix)
     return check_prefix_and_length(prefix, data, length)
 
 
-def to_acc_pubkey(data: ValPubKey) -> AccPubKey:
+def to_acc_pubkey(data: ValPubKey, prefix: str = DEFAULT_PREFIX) -> AccPubKey:
     """Converts a validator pubkey into an account pubkey.
 
     Args:
@@ -154,10 +161,10 @@ def to_acc_pubkey(data: ValPubKey) -> AccPubKey:
     vals = bech32_decode(data)
     if vals[1] is None:
         raise ValueError(f"invalid bech32: {data}")
-    return AccPubKey(bech32_encode("secretpub", vals[1]))
+    return AccPubKey(bech32_encode(f"{prefix}pub", vals[1]))
 
 
-def is_val_pubkey(data: str) -> bool:
+def is_val_pubkey(data: str, prefix: str = DEFAULT_PREFIX) -> bool:
     """Checks whether provided string is a properly formatted Secret validator pubkey.
 
     Args:
@@ -166,11 +173,13 @@ def is_val_pubkey(data: str) -> bool:
     Returns:
         bool: whether string is validator pubkey
     """
-    prefix, length = bech32_config["val_pubkey"]
+    #prefix, length = bech32_config["val_pubkey"]
+    prefix = str(f"{prefix}valoperpub")
+    length = 39 + len(prefix)
     return check_prefix_and_length(prefix, data, length)
 
 
-def to_val_pubkey(data: AccPubKey) -> ValPubKey:
+def to_val_pubkey(data: AccPubKey, prefix: str = DEFAULT_PREFIX) -> ValPubKey:
     """Converts an account pubkey into a validator pubkey.
 
     Args:
@@ -185,10 +194,10 @@ def to_val_pubkey(data: AccPubKey) -> ValPubKey:
     vals = bech32_decode(data)
     if vals[1] is None:
         raise ValueError(f"invalid bech32: {data}")
-    return ValPubKey(bech32_encode("secretvaloperpub", vals[1]))
+    return ValPubKey(bech32_encode(f"{prefix}valoperpub", vals[1]))
 
 
-def is_valcons_pubkey(data: str) -> bool:  # -> ValConsPubKey:
+def is_valcons_pubkey(data: str, prefix: str = DEFAULT_PREFIX) -> bool:  # -> ValConsPubKey:
     """Checks whether provided string is a properly formatted Secret validator consensus
     pubkey.
 
@@ -198,5 +207,7 @@ def is_valcons_pubkey(data: str) -> bool:  # -> ValConsPubKey:
     Returns:
         bool: whether string is validator consensus pubkey
     """
-    prefix, length = bech32_config["valcons_pubkey"]
+    #prefix, length = bech32_config["valcons_pubkey"]
+    prefix = str(f"{prefix}valconspub")
+    length = 39 + len(prefix)
     return check_prefix_and_length(prefix, data, length)
